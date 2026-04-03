@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const PORT = process.env.PORT || 3000;
 
 const activeMatches = [];
 let lobbyHost = null;
@@ -19,13 +20,18 @@ const {
 } = require('./gameLogic');
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:4200",
+  "*"
+];
 
 // 🌐 GLOBAL LOBBY
 const lobbyPlayers = [];
 
 // ✅ Express CORS
 app.use(cors({
-  origin: "http://localhost:4200"
+  origin: allowedOrigins,
+  credentials: true
 }));
 
 // ✅ Create server
@@ -33,9 +39,11 @@ const server = http.createServer(app);
 
 // ✅ Socket.IO
 const io = new Server(server, {
+  transports: ['websocket'],
   cors: {
-    origin: "http://localhost:4200",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: tru
   }
 });
 
@@ -271,6 +279,6 @@ function serializeRoom(room) {
 
 
 // 🚀 START SERVER
-server.listen(3000, () => {
-  console.log('🚀 Server running on port 3000');
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
